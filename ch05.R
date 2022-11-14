@@ -147,10 +147,28 @@ for(i in 1:nrow(mods)) mods$aic[i] <- AIC(
   arima(oil.ret, order = c(mods$ar[i], 0, mods$ma[i]),include.mean = mods$mean[i]))
 
 mods[which.min(mods$aic),]
-arima(oil.ret, order = c(0, 0, 1), include.mean = FALSE)
+oil_ma1 <- arima(oil.ret, order = c(0, 0, 1), include.mean = FALSE)
 
 
 library("forecast")
 auto.arima(oil.ret, ic = "aic", stationary = TRUE,
            max.p = 2, max.q = 2, max.P = 0, max.Q = 0,
            stepwise = FALSE, trace = TRUE, approximation = FALSE)
+
+
+# get residuals:
+oil_res <- residuals(oil_ma1) / sqrt(oil_ma1$sigma2)
+plot(oil_res)
+abline(h=0)
+
+# Box-Pierce Test:
+Box.test(oil_res, lag = 5, fitdf = 1)
+
+# Write your own BP test:
+n <- length(oil_res)
+test_statistic <- n *sum(acf(oil_res, lag.max = 5, plot = FALSE)$acf[2:6]^2)
+p_val <- 1-pchisq(q = test_statistic, df = 5 -1)
+
+# Diagnostics for your model:
+tsdiag(oil_ma1)
+
