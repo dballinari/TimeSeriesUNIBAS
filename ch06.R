@@ -80,6 +80,7 @@ plot(log_oil)
 # constant
 oil_level_model <- arima(log_oil, order = c(0, 1, 1))
 
+tail(log_oil)
 # Forecast the remaining 11 months of 2006 for the log oil price
 oil_level_fc <- forecast(oil_level_model, h = 11)
 oil_level_fc
